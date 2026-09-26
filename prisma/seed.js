@@ -15,10 +15,10 @@ async function main() {
 
   const defaultPassword = await bcrypt.hash('password123', 10);
 
-  // 2. Buat Akun Pengguna (Admin, Toolman, Peminjam)
+  // 2. Buat Akun Pengguna — Semua dengan role ADMIN agar bisa mengakses seluruh fitur sistem
   const adminUser = await prisma.user.create({
     data: {
-      username: 'admin',
+      username: 'novetri',
       password: defaultPassword,
       nama: 'Novetri Amelia Putri, S.Kom',
       role: 'ADMIN',
@@ -29,10 +29,10 @@ async function main() {
 
   const toolmanUser = await prisma.user.create({
     data: {
-      username: 'toolman',
+      username: 'agneta',
       password: defaultPassword,
       nama: 'Agneta Lindari Maharani, A.Md',
-      role: 'TOOLMAN',
+      role: 'ADMIN',
       nisn: 'NIP. 199407222020121008',
       telepon: '081398765432'
     }
@@ -40,10 +40,10 @@ async function main() {
 
   const peminjamUser = await prisma.user.create({
     data: {
-      username: 'peminjam',
+      username: 'mutiara',
       password: defaultPassword,
       nama: 'Mutiara Khairunnisa Faizia',
-      role: 'PEMINJAM',
+      role: 'ADMIN',
       nisn: '0068491823',
       telepon: '085711223344'
     }
@@ -54,7 +54,7 @@ async function main() {
       username: 'kelysa',
       password: defaultPassword,
       nama: 'Kelysa Adesti Manggraini',
-      role: 'PEMINJAM',
+      role: 'ADMIN',
       nisn: '0071239841',
       telepon: '085899887766'
     }
@@ -65,13 +65,13 @@ async function main() {
       username: 'rendy',
       password: defaultPassword,
       nama: 'Rendy Pratama',
-      role: 'PEMINJAM',
+      role: 'ADMIN',
       nisn: '0069921102',
       telepon: '081299881122'
     }
   });
 
-  console.log('✅ Pengguna demo berhasil dibuat (admin, toolman, peminjam)!');
+  console.log('✅ Pengguna demo berhasil dibuat (5 akun, semua role ADMIN)!');
 
   // 3. Buat Kategori Alat Praktikum
   const catJaringan = await prisma.category.create({
