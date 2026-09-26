@@ -115,8 +115,8 @@ async function printReport(req, res) {
       startDate: startDate || null,
       endDate: endDate || null,
       selectedStatus: status || 'ALL',
-      kepalaLab: kepalaLab || { nama: 'Ahmad Subarjo, S.Kom', nisn: 'NIP. 198203152008011005' },
-      toolmanUser: toolmanUser || { nama: 'Bagus Prakoso, A.Md', nisn: 'NIP. 199407222020121008' },
+      kepalaLab: kepalaLab || { nama: 'Novetri Amelia Putri, S.Kom', nisn: 'NIP. 198203152008011005' },
+      toolmanUser: toolmanUser || { nama: 'Agneta Lindari Maharani, A.Md', nisn: 'NIP. 199407222020121008' },
       printDate: new Date()
     });
   } catch (error) {

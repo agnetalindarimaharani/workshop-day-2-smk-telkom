@@ -32,9 +32,9 @@ Aplikasi dilengkapi tombol **Quick Switch Demo Akun** di halaman login (`/login`
 
 | Role | Username | Password | Nama Lengkap & Posisi | Akses Utama |
 |:---|:---|:---|:---|:---|
-| **ADMIN** | `admin` | `password123` | Ahmad Subarjo, S.Kom (Kepala Lab Komputer) | Master Data, User, Kategori, Tools, Log Audit |
-| **TOOLMAN** | `toolman` | `password123` | Bagus Prakoso, A.Md (Toolman / Laboran) | Approval Pinjam, Inspeksi Fisik, Denda, Cetak Laporan |
-| **PEMINJAM** | `peminjam` | `password123` | Dimas Aditya Pratama (Siswa XII RPL 1) | Katalog Alat, Pengajuan Pinjam, Konfirmasi Meja Toolman |
+| **ADMIN** | `admin` | `password123` | Novetri Amelia Putri, S.Kom (Kepala Lab Komputer) | Master Data, User, Kategori, Tools, Log Audit |
+| **TOOLMAN** | `toolman` | `password123` | Agneta Lindari Maharani, A.Md (Toolman / Laboran) | Approval Pinjam, Inspeksi Fisik, Denda, Cetak Laporan |
+| **PEMINJAM** | `peminjam` | `password123` | Mutiara Khairunnisa Faizia (Siswa XII RPL 1) | Katalog Alat, Pengajuan Pinjam, Konfirmasi Meja Toolman |
 
 ---
 
@@ -116,7 +116,7 @@ Aplikasi dilengkapi tombol **Quick Switch Demo Akun** di halaman login (`/login`
 * **Tujuan:** Memvalidasi proses pengembalian alat praktikum, inspeksi fisik oleh Toolman, penetapan denda ganti rugi, pengembalian stok, dan rekam jejak audit log.
 * **Langkah-Langkah:**
   1. Login sebagai Toolman (`toolman` / `password123`).
-  2. Temukan transaksi peminjaman aktif Mikrotik milik siswa Dimas Aditya.
+  2. Temukan transaksi peminjaman aktif Mikrotik milik siswa Mutiara Khairunnisa Faizia.
   3. Klik tombol **Inspeksi & Terima Pengembalian** (`/borrowings/:id/return`).
   4. Pilih hasil pemeriksaan fisik: **Kondisi RUSAK**.
   5. Masukkan nominal denda ganti rugi: **Rp 50.000**.

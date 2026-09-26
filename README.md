@@ -121,9 +121,9 @@ Halaman login (`/login`) menyediakan **tombol cepat (1-klik)** untuk mengisi aku
 
 | Akun | Username | Password | Nama & Posisi |
 |:---|:---|:---|:---|
-| **Admin** | `admin` | `password123` | Ahmad Subarjo, S.Kom (Kepala Laboratorium) |
-| **Toolman** | `toolman` | `password123` | Bagus Prakoso, A.Md (Toolman / Laboran) |
-| **Peminjam** | `peminjam` | `password123` | Dimas Aditya Pratama (Siswa XII RPL 1) |
+| **Admin** | `admin` | `password123` | Novetri Amelia Putri, S.Kom (Kepala Laboratorium) |
+| **Toolman** | `toolman` | `password123` | Agneta Lindari Maharani, A.Md (Toolman / Laboran) |
+| **Peminjam** | `peminjam` | `password123` | Mutiara Khairunnisa Faizia (Siswa XII RPL 1) |
 
 ---
 

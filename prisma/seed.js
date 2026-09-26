@@ -20,7 +20,7 @@ async function main() {
     data: {
       username: 'admin',
       password: defaultPassword,
-      nama: 'Ahmad Subarjo, S.Kom',
+      nama: 'Novetri Amelia Putri, S.Kom',
       role: 'ADMIN',
       nisn: 'NIP. 198203152008011005',
       telepon: '081234567890'
@@ -31,7 +31,7 @@ async function main() {
     data: {
       username: 'toolman',
       password: defaultPassword,
-      nama: 'Bagus Prakoso, A.Md',
+      nama: 'Agneta Lindari Maharani, A.Md',
       role: 'TOOLMAN',
       nisn: 'NIP. 199407222020121008',
       telepon: '081398765432'
@@ -42,7 +42,7 @@ async function main() {
     data: {
       username: 'peminjam',
       password: defaultPassword,
-      nama: 'Dimas Aditya Pratama',
+      nama: 'Mutiara Khairunnisa Faizia',
       role: 'PEMINJAM',
       nisn: '0068491823',
       telepon: '085711223344'
@@ -51,9 +51,9 @@ async function main() {
 
   const peminjam2 = await prisma.user.create({
     data: {
-      username: 'siti',
+      username: 'kelysa',
       password: defaultPassword,
-      nama: 'Siti Nurhaliza',
+      nama: 'Kelysa Adesti Manggraini',
       role: 'PEMINJAM',
       nisn: '0071239841',
       telepon: '085899887766'
@@ -62,11 +62,11 @@ async function main() {
 
   const guruUser = await prisma.user.create({
     data: {
-      username: 'budi_guru',
+      username: 'rendy',
       password: defaultPassword,
-      nama: 'Budi Santoso, S.Pd',
+      nama: 'Rendy Pratama',
       role: 'PEMINJAM',
-      nisn: 'NIP. 198811122015031002',
+      nisn: '0069921102',
       telepon: '081299881122'
     }
   });
@@ -276,49 +276,49 @@ async function main() {
       {
         userId: adminUser.id,
         aksi: 'INISIALISASI_SISTEM',
-        keterangan: 'Admin menginisialisasi sistem sarpras dan data master kategori alat.',
+        keterangan: 'Admin Novetri Amelia Putri menginisialisasi sistem sarpras dan data master kategori alat.',
         createdAt: threeDaysAgo
       },
       {
         userId: peminjamUser.id,
         aksi: 'AJUKAN_PINJAM',
-        keterangan: 'Siswa Dimas Aditya mengajukan peminjaman Crimping Tool Proskit (1 unit).',
+        keterangan: 'Siswa Mutiara Khairunnisa Faizia mengajukan peminjaman Crimping Tool Proskit (1 unit).',
         createdAt: threeDaysAgo
       },
       {
         userId: toolmanUser.id,
         aksi: 'SETUJUI_PINJAM',
-        keterangan: 'Toolman Bagus menyetujui peminjaman Crimping Tool Proskit untuk Dimas Aditya.',
+        keterangan: 'Toolman Agneta Lindari Maharani menyetujui peminjaman Crimping Tool Proskit untuk Mutiara Khairunnisa.',
         createdAt: threeDaysAgo
       },
       {
         userId: toolmanUser.id,
         aksi: 'INSPEKSI_PENGEMBALIAN',
-        keterangan: 'Toolman Bagus memproses pengembalian Crimping Tool: Fisik BAIK, Denda Rp 0.',
+        keterangan: 'Toolman Agneta Lindari Maharani memproses pengembalian Crimping Tool: Fisik BAIK, Denda Rp 0.',
         createdAt: twoDaysAgo
       },
       {
         userId: toolmanUser.id,
         aksi: 'INSPEKSI_PENGEMBALIAN',
-        keterangan: 'Toolman Bagus memeriksa pengembalian LAN Tester dari Siti Nurhaliza: Kondisi RUSAK, Denda Rp 50.000.',
+        keterangan: 'Toolman Agneta Lindari Maharani memeriksa pengembalian LAN Tester dari Kelysa Adesti Manggraini: Kondisi RUSAK, Denda Rp 50.000.',
         createdAt: yesterday
       },
       {
         userId: peminjamUser.id,
         aksi: 'AJUKAN_PINJAM',
-        keterangan: 'Siswa Dimas Aditya mengajukan pinjam Router Mikrotik RB750Gr3 (1 unit).',
+        keterangan: 'Siswa Mutiara Khairunnisa Faizia mengajukan pinjam Router Mikrotik RB750Gr3 (1 unit).',
         createdAt: yesterday
       },
       {
         userId: toolmanUser.id,
         aksi: 'SETUJUI_PINJAM',
-        keterangan: 'Toolman Bagus menyetujui peminjaman Router Mikrotik RB750Gr3 untuk Dimas Aditya. Stok berkurang menjadi 7.',
+        keterangan: 'Toolman Agneta Lindari Maharani menyetujui peminjaman Router Mikrotik RB750Gr3 untuk Mutiara Khairunnisa. Stok berkurang menjadi 7.',
         createdAt: yesterday
       },
       {
         userId: peminjamUser.id,
         aksi: 'AJUKAN_PINJAM',
-        keterangan: 'Siswa Dimas Aditya mengajukan peminjaman Digital Multimeter Sanwa (1 unit).',
+        keterangan: 'Siswa Mutiara Khairunnisa Faizia mengajukan peminjaman Digital Multimeter Sanwa (1 unit).',
         createdAt: now
       }
     ]
