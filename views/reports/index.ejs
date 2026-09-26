@@ -1,0 +1,162 @@
+<%- include('../partials/header') %>
+
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Laporan Sirkulasi Sarana Praktikum</h1>
+    <p class="text-sm text-slate-500 mt-1">Rekapitulasi sirkulasi alat praktikum lab, status pengembalian, dan penerimaan denda</p>
+  </div>
+  <% 
+    const printUrl = `/reports/print?startDate=${startDate}&endDate=${endDate}&status=${selectedStatus}&categoryId=${selectedCategory}`;
+  %>
+  <a href="<%= printUrl %>" target="_blank" class="inline-flex items-center space-x-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-600/30 transition">
+    <i class="fas fa-print"></i>
+    <span>Cetak Laporan Resmi (PDF/Print)</span>
+  </a>
+</div>
+
+<!-- Filter Box -->
+<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6">
+  <form action="/reports" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+    <div>
+      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Dari Tanggal</label>
+      <input type="date" name="startDate" value="<%= startDate %>" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Sampai Tanggal</label>
+      <input type="date" name="endDate" value="<%= endDate %>" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Status Sirkulasi</label>
+      <select name="status" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
+        <option value="ALL">Semua Status</option>
+        <option value="RETURNED" <%= selectedStatus === 'RETURNED' ? 'selected' : '' %>>Selesai Kembali</option>
+        <option value="APPROVED" <%= selectedStatus === 'APPROVED' ? 'selected' : '' %>>Sedang Dipinjam</option>
+        <option value="PENDING" <%= selectedStatus === 'PENDING' ? 'selected' : '' %>>Menunggu Approval</option>
+        <option value="REJECTED" <%= selectedStatus === 'REJECTED' ? 'selected' : '' %>>Ditolak</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Kategori Alat</label>
+      <select name="categoryId" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800">
+        <option value="ALL">Semua Kategori</option>
+        <% categories.forEach(cat => { %>
+          <option value="<%= cat.id %>" <%= selectedCategory == cat.id ? 'selected' : '' %>>
+            <%= cat.namaKategori %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="flex space-x-2">
+      <button type="submit" class="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 cursor-pointer">
+        <i class="fas fa-filter"></i>
+        <span>Terapkan</span>
+      </button>
+      <a href="/reports" class="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold flex items-center justify-center" title="Reset">
+        <i class="fas fa-undo"></i>
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+  <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Transaksi Tersaring</p>
+    <h3 class="text-2xl font-black text-slate-800 mt-1"><%= borrowings.length %></h3>
+    <p class="text-xs text-slate-500 mt-1">Sirkulasi dalam kriteria filter</p>
+  </div>
+
+  <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-xs font-bold uppercase tracking-wider text-blue-600">Total Unit Alat Dipinjam</p>
+    <h3 class="text-2xl font-black text-blue-700 mt-1"><%= totalUnit %> <span class="text-xs font-normal text-slate-500">unit</span></h3>
+    <p class="text-xs text-slate-500 mt-1">Akumulasi kuantitas alat</p>
+  </div>
+
+  <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-xs font-bold uppercase tracking-wider text-rose-600">Total Denda Kerusakan</p>
+    <h3 class="text-2xl font-black text-rose-700 mt-1"><%= formatRupiah(totalDenda) %></h3>
+    <p class="text-xs text-slate-500 mt-1">Penerimaan ganti rugi lab</p>
+  </div>
+</div>
+
+<!-- Report Table -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+  <% if (borrowings.length === 0) { %>
+    <div class="py-16 text-center text-slate-400">
+      <i class="fas fa-file-invoice text-5xl mb-3 text-slate-300"></i>
+      <h3 class="text-base font-bold text-slate-700">Tidak ada data sirkulasi pada periode ini</h3>
+      <p class="text-xs text-slate-400 mt-1">Ubah rentang tanggal atau status filter di atas.</p>
+    </div>
+  <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
+            <th class="py-3 px-4">No</th>
+            <th class="py-3 px-4">Tgl Pinjam</th>
+            <th class="py-3 px-4">Peminjam</th>
+            <th class="py-3 px-4">Alat Praktikum</th>
+            <th class="py-3 px-3 text-center">Qty</th>
+            <th class="py-3 px-4 text-center">Status</th>
+            <th class="py-3 px-4">Kondisi Kembali</th>
+            <th class="py-3 px-4 text-right">Denda (Rp)</th>
+            <th class="py-3 px-4">Petugas Toolman</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+          <% borrowings.forEach((b, idx) => { %>
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-3.5 px-4 font-mono text-slate-400"><%= idx + 1 %></td>
+              <td class="py-3.5 px-4 whitespace-nowrap text-slate-700 font-medium">
+                <%= formatDate(b.tglPinjam) %>
+              </td>
+              <td class="py-3.5 px-4">
+                <div class="font-bold text-slate-800"><%= b.user.nama %></div>
+                <div class="text-[11px] text-slate-400 font-mono"><%= b.user.nisn || b.user.username %></div>
+              </td>
+              <td class="py-3.5 px-4">
+                <div class="font-semibold text-slate-800"><%= b.tool.namaAlat %></div>
+                <div class="text-[11px] text-slate-400"><%= b.tool.category ? b.tool.category.namaKategori : '-' %></div>
+              </td>
+              <td class="py-3.5 px-3 text-center font-bold text-slate-700">
+                <%= b.jumlah %>
+              </td>
+              <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                <% if (b.status === 'PENDING') { %>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Menunggu</span>
+                <% } else if (b.status === 'APPROVED') { %>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">Dipinjam</span>
+                <% } else if (b.status === 'RETURNED') { %>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">Kembali</span>
+                <% } else { %>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800">Ditolak</span>
+                <% } %>
+              </td>
+              <td class="py-3.5 px-4 whitespace-nowrap">
+                <% if (b.kondisiKembali === 'RUSAK') { %>
+                  <span class="text-rose-600 font-bold">RUSAK</span>
+                <% } else if (b.kondisiKembali === 'BAIK') { %>
+                  <span class="text-emerald-600 font-bold">BAIK</span>
+                <% } else { %>
+                  <span class="text-slate-400">-</span>
+                <% } %>
+              </td>
+              <td class="py-3.5 px-4 text-right font-bold <%= b.denda > 0 ? 'text-rose-600' : 'text-slate-500' %>">
+                <%= formatRupiah(b.denda) %>
+              </td>
+              <td class="py-3.5 px-4 text-slate-600">
+                <%= b.toolman ? b.toolman.nama : '-' %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

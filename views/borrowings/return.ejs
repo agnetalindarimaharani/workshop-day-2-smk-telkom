@@ -1,0 +1,197 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-3xl mx-auto">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <a href="/borrowings" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center mb-1">
+        <i class="fas fa-arrow-left mr-1.5"></i> Kembali ke Sirkulasi
+      </a>
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Inspeksi Fisik & Proses Pengembalian</h1>
+      <p class="text-xs text-slate-500 mt-1">Pemeriksaan kondisi fisik alat oleh Toolman / Laboran & penetapan denda ganti rugi</p>
+    </div>
+  </div>
+
+  <!-- Ringkasan Transaksi Peminjaman -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-6">
+    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center">
+      <i class="fas fa-clipboard-check text-blue-600 mr-2"></i> Rincian Peminjaman Sarpras
+    </h3>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+      <div class="p-3.5 bg-slate-50 rounded-xl">
+        <span class="text-xs text-slate-400 block font-medium">Siswa Peminjam</span>
+        <span class="font-bold text-slate-900 text-base"><%= borrowing.user.nama %></span>
+        <span class="text-xs text-slate-500 block font-mono">NISN: <%= borrowing.user.nisn || '-' %></span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl">
+        <span class="text-xs text-slate-400 block font-medium">Alat Praktikum</span>
+        <span class="font-bold text-slate-900 text-base"><%= borrowing.tool.namaAlat %></span>
+        <span class="text-xs text-slate-500 block">Jumlah: <strong><%= borrowing.jumlah %> Unit</strong></span>
+      </div>
+
+      <div class="p-3.5 bg-slate-50 rounded-xl">
+        <span class="text-xs text-slate-400 block font-medium">Jadwal Kembali</span>
+        <span class="font-bold text-slate-900"><%= formatDate(borrowing.tglKembaliRencana) %></span>
+        <span class="text-xs <%= new Date(borrowing.tglKembaliRencana) < new Date() ? 'text-rose-600 font-bold' : 'text-emerald-600' %> block mt-0.5">
+          <%= new Date(borrowing.tglKembaliRencana) < new Date() ? 'Lewat Batas Waktu' : 'Tepat Waktu' %>
+        </span>
+      </div>
+    </div>
+    <% if (borrowing.catatan) { %>
+      <div class="mt-3 text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
+        <span class="font-bold text-slate-700">Catatan Peminjaman:</span> <%= borrowing.catatan %>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Form Inspeksi Toolman -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+    
+    <!-- Template Simulasi Skenario 5 UKK -->
+    <div class="mb-6 p-4 rounded-xl bg-rose-50/80 border border-rose-200">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-bold text-rose-800 flex items-center">
+          <i class="fas fa-triangle-exclamation text-rose-600 mr-1.5"></i> Template Pengujian Cepat (Skenario 5 UKK)
+        </span>
+        <span class="text-[11px] text-rose-700">Simulasi Kondisi Rusak & Denda</span>
+      </div>
+      <button type="button" onclick="fillScenario5()" class="px-3 py-1.5 rounded-lg bg-white hover:bg-rose-100 text-rose-800 border border-rose-300 text-xs font-bold shadow-xs transition flex items-center space-x-1.5 cursor-pointer">
+        <span>⚡ Simulasi Kondisi Rusak & Hitung Denda Rp 50.000</span>
+      </button>
+    </div>
+
+    <form action="/borrowings/<%= borrowing.id %>/return" method="POST" class="space-y-6">
+      
+      <!-- Kondisi Fisik Alat -->
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+          Hasil Pemeriksaan Fisik Alat <span class="text-rose-500">*</span>
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="cursor-pointer p-4 rounded-xl border border-slate-200 hover:border-emerald-500 flex items-center space-x-3 transition has-[:checked]:bg-emerald-50 has-[:checked]:border-emerald-500 has-[:checked]:ring-1 has-[:checked]:ring-emerald-500">
+            <input type="radio" name="kondisiKembali" value="BAIK" checked class="text-emerald-600 focus:ring-emerald-500" onchange="handleConditionChange('BAIK')">
+            <div>
+              <span class="font-bold text-sm text-slate-900 block">Kondisi BAIK</span>
+              <span class="text-xs text-slate-500">Fisik normal, bersih & fungsi utuh</span>
+            </div>
+          </label>
+
+          <label class="cursor-pointer p-4 rounded-xl border border-slate-200 hover:border-rose-500 flex items-center space-x-3 transition has-[:checked]:bg-rose-50 has-[:checked]:border-rose-500 has-[:checked]:ring-1 has-[:checked]:ring-rose-500">
+            <input type="radio" name="kondisiKembali" id="radioRusak" value="RUSAK" class="text-rose-600 focus:ring-rose-500" onchange="handleConditionChange('RUSAK')">
+            <div>
+              <span class="font-bold text-sm text-slate-900 block text-rose-700">Kondisi RUSAK</span>
+              <span class="text-xs text-slate-500">Cacat fisik / fungsi terganggu</span>
+            </div>
+          </label>
+
+          <label class="cursor-pointer p-4 rounded-xl border border-slate-200 hover:border-slate-800 flex items-center space-x-3 transition has-[:checked]:bg-slate-100 has-[:checked]:border-slate-800 has-[:checked]:ring-1 has-[:checked]:ring-slate-800">
+            <input type="radio" name="kondisiKembali" value="HILANG" class="text-slate-900 focus:ring-slate-900" onchange="handleConditionChange('HILANG')">
+            <div>
+              <span class="font-bold text-sm text-slate-900 block">Alat HILANG</span>
+              <span class="text-xs text-slate-500">Tidak dikembalikan ke lab</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Nominal Denda -->
+      <div>
+        <label for="denda" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Nominal Denda Kerusakan / Ganti Rugi (Rp) <span class="text-rose-500">*</span>
+        </label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none font-bold text-sm text-slate-400">
+            Rp
+          </div>
+          <input 
+            type="number" 
+            name="denda" 
+            id="denda" 
+            min="0" 
+            step="1000" 
+            value="0" 
+            required 
+            class="w-full pl-12 pr-4 py-2.5 text-base font-bold bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-900"
+          >
+        </div>
+
+        <!-- Preset Denda Buttons -->
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span class="text-xs text-slate-400 self-center mr-1">Preset Cepat:</span>
+          <button type="button" onclick="setDenda(0)" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
+            Rp 0 (Baik)
+          </button>
+          <button type="button" onclick="setDenda(25000)" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
+            Rp 25.000 (Ringan)
+          </button>
+          <button type="button" onclick="setDenda(50000)" class="px-2.5 py-1 rounded bg-rose-100 hover:bg-rose-200 text-rose-800 text-xs font-bold border border-rose-300">
+            Rp 50.000 (Sedang/Sparepart)
+          </button>
+          <button type="button" onclick="setDenda(100000)" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
+            Rp 100.000 (Berat)
+          </button>
+        </div>
+      </div>
+
+      <!-- Keterangan Catatan Pemeriksaan -->
+      <div>
+        <label for="catatanInspeksi" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Catatan Hasil Inspeksi Fisik Toolman
+        </label>
+        <textarea 
+          name="catatanInspeksi" 
+          id="catatanInspeksi" 
+          rows="3" 
+          placeholder="Contoh: Alat dikembalikan dalam keadaan bersih dan berfungsi normal."
+          class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800"
+        ></textarea>
+      </div>
+
+      <!-- Checkbox Kondisi Alat di Inventaris -->
+      <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+        <label class="flex items-center space-x-2.5 cursor-pointer text-xs font-medium text-slate-700">
+          <input type="checkbox" name="updateToolCondition" value="yes" id="updateToolCondition" class="rounded text-rose-600 focus:ring-rose-500 w-4 h-4">
+          <span>Jika kondisi RUSAK, tandai status alat di data master inventaris lab sebagai <strong>RUSAK (Perlu Servis)</strong></span>
+        </label>
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+        <a href="/borrowings" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition">
+          Batal
+        </a>
+        <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center space-x-1.5 cursor-pointer">
+          <i class="fas fa-check-double"></i>
+          <span>Konfirmasi Pengembalian & Catat Log</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function setDenda(nominal) {
+    document.getElementById('denda').value = nominal;
+  }
+
+  function handleConditionChange(cond) {
+    if (cond === 'BAIK') {
+      setDenda(0);
+      document.getElementById('catatanInspeksi').value = 'Alat dikembalikan tepat waktu, kondisi fisik utuh dan siap pakai kembali.';
+      document.getElementById('updateToolCondition').checked = false;
+    } else if (cond === 'RUSAK') {
+      if (document.getElementById('denda').value == 0) {
+        setDenda(50000);
+      }
+      document.getElementById('updateToolCondition').checked = true;
+    }
+  }
+
+  function fillScenario5() {
+    document.getElementById('radioRusak').checked = true;
+    setDenda(50000);
+    document.getElementById('catatanInspeksi').value = 'Pemeriksaan fisik menemukan soket LAN port retak dan adaptor kabel longgar. Denda ganti rugi perbaikan sparepart lab ditetapkan sebesar Rp 50.000.';
+    document.getElementById('updateToolCondition').checked = true;
+  }
+</script>
+
+<%- include('../partials/footer') %>

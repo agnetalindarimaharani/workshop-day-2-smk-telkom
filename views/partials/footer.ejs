@@ -1,24 +1,15 @@
-    </div>
-  </main>
+    </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div>
-        <p><strong>SEWA AJA</strong> — Sistem Operasional Persewaan Busana Tradisional, Kebaya & Jas</p>
-        <p style="margin-top: 0.2rem; font-size: 0.8rem;">
-          Workshop Guru Tamu Industri: <em>AI-Driven Code & Culture (PjBL RPL)</em> — <strong>SMK Telkom Lampung $\times$ Lampung Dev (2026)</strong>
-        </p>
+<% if (typeof user !== 'undefined' && user) { %>
+    <!-- Footer -->
+    <footer class="no-print bg-white border-t border-slate-200 px-6 py-4 text-center text-xs text-slate-500">
+      <div class="flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto gap-2">
+        <p>&copy; 2026 <strong><%= schoolName %></strong> — Sistem Peminjaman Sarpras Lab RPL & Elektronika.</p>
+        <p class="text-slate-400">Arsitektur MVC Express.js + SQLite Prisma ORM + RBAC 3-Level</p>
       </div>
-      <div class="footer-links">
-        <a href="/">Dashboard</a>
-        <a href="/items">Katalog Busana</a>
-        <a href="/rentals">Transaksi Sewa</a>
-        <a href="https://codeathome.id/workshop-pjbl-smk-telkom-day-2" target="_blank" rel="noopener">Portal Tugas ↗</a>
-      </div>
-    </div>
-  </footer>
+    </footer>
+  </div>
+<% } %>
 
-  <script src="/js/main.js"></script>
 </body>
 </html>

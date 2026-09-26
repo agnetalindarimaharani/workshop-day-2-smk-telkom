@@ -1,0 +1,171 @@
+<%- include('../partials/header') %>
+
+<!-- Top Student Banner -->
+<div class="mb-8 bg-gradient-to-r from-emerald-900 via-teal-900 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+  <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-semibold backdrop-blur-sm mb-3 border border-emerald-400/30">
+        <i class="fas fa-user-graduate text-emerald-400"></i>
+        <span>Portal Peminjam: Siswa / Praktikan Lab</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Halo, <%= user.nama %>!</h1>
+      <p class="text-emerald-100/80 text-sm mt-1 max-w-xl">
+        NISN: <span class="font-mono font-semibold text-white"><%= user.nisn || '-' %></span> • No. HP: <span class="font-mono font-semibold text-white"><%= user.telepon || '-' %></span>
+      </p>
+      <p class="text-slate-300 text-xs mt-2">
+        Silakan ajukan peminjaman alat praktikum untuk kegiatan belajar di laboratorium RPL & Elektronika.
+      </p>
+    </div>
+    <div class="shrink-0">
+      <a href="/borrowings/create" class="inline-flex items-center space-x-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/30 transition transform hover:-translate-y-0.5">
+        <i class="fas fa-plus-circle text-base"></i>
+        <span>Ajukan Pinjam Alat Baru</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 4 Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-5 mb-8">
+  <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Pengajuan</p>
+    <h3 class="text-2xl font-black text-slate-800 mt-1"><%= stats.total %></h3>
+    <p class="text-xs text-slate-500 mt-2">Riwayat peminjaman Anda</p>
+  </div>
+  <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-xs font-bold uppercase tracking-wider text-amber-600">Menunggu Approval</p>
+    <h3 class="text-2xl font-black text-amber-600 mt-1"><%= stats.myPendingCount %></h3>
+    <p class="text-xs text-slate-500 mt-2">Dalam verifikasi Toolman</p>
+  </div>
+  <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-xs font-bold uppercase tracking-wider text-blue-600">Sedang Dipinjam</p>
+    <h3 class="text-2xl font-black text-blue-600 mt-1"><%= stats.myActiveCount %></h3>
+    <p class="text-xs text-slate-500 mt-2">Harap jaga fisik alat</p>
+  </div>
+  <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+    <p class="text-xs font-bold uppercase tracking-wider text-emerald-600">Selesai Kembali</p>
+    <h3 class="text-2xl font-black text-emerald-600 mt-1"><%= stats.myReturnedCount %></h3>
+    <p class="text-xs text-slate-500 mt-2">Alat telah diterima Toolman</p>
+  </div>
+</div>
+
+<!-- SECTION 1: PEMINJAMAN SAYA YANG AKTIF (DIPINJAM / MENUNGGU) -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h3 class="text-lg font-bold text-slate-900">Status Peminjaman Anda Saat Ini</h3>
+      <p class="text-xs text-slate-500">Pantau alat yang sedang dipinjam dan kembalikan ke meja toolman tepat waktu</p>
+    </div>
+    <a href="/borrowings" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">
+      Lihat Riwayat Lengkap &rarr;
+    </a>
+  </div>
+
+  <% const ongoingBorrowings = myBorrowings.filter(b => b.status === 'PENDING' || b.status === 'APPROVED'); %>
+  <% if (ongoingBorrowings.length === 0) { %>
+    <div class="py-10 text-center rounded-xl bg-slate-50 border border-dashed border-slate-200 text-slate-400">
+      <i class="fas fa-hand-holding-box text-4xl text-slate-300 mb-2"></i>
+      <p class="text-sm font-medium text-slate-600">Anda tidak sedang meminjam alat praktikum.</p>
+      <p class="text-xs text-slate-400 mt-1">Perlu alat untuk praktikum? Klik tombol "Ajukan Pinjam Alat Baru" di atas.</p>
+    </div>
+  <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
+            <th class="py-3 px-4 rounded-l-lg">Alat Praktikum</th>
+            <th class="py-3 px-4 text-center">Jumlah</th>
+            <th class="py-3 px-4">Tgl Pinjam</th>
+            <th class="py-3 px-4">Rencana Kembali</th>
+            <th class="py-3 px-4 text-center">Status</th>
+            <th class="py-3 px-4 text-right rounded-r-lg">Aksi Siswa</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <% ongoingBorrowings.forEach(item => { %>
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-4 px-4">
+                <div class="font-bold text-slate-900"><%= item.tool.namaAlat %></div>
+                <div class="text-xs text-slate-500"><%= item.catatan || 'Praktikum' %></div>
+              </td>
+              <td class="py-4 px-4 text-center font-bold text-slate-700">
+                <%= item.jumlah %> Unit
+              </td>
+              <td class="py-4 px-4 text-xs text-slate-600 whitespace-nowrap">
+                <%= formatDate(item.tglPinjam) %>
+              </td>
+              <td class="py-4 px-4 text-xs font-semibold whitespace-nowrap <%= new Date(item.tglKembaliRencana) < new Date() ? 'text-rose-600' : 'text-slate-600' %>">
+                <%= formatDate(item.tglKembaliRencana) %>
+              </td>
+              <td class="py-4 px-4 text-center">
+                <% if (item.status === 'PENDING') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                    <i class="fas fa-hourglass-half mr-1 text-[10px]"></i> Menunggu Approval
+                  </span>
+                <% } else if (item.status === 'APPROVED') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                    <i class="fas fa-check-circle mr-1 text-[10px]"></i> Sedang Dipinjam
+                  </span>
+                <% } %>
+              </td>
+              <td class="py-4 px-4 text-right whitespace-nowrap">
+                <% if (item.status === 'APPROVED') { %>
+                  <!-- Fitur 13: Mengembalikan Alat ke Meja Toolman -->
+                  <form action="/borrowings/<%= item.id %>/return-request" method="POST" onsubmit="return confirm('Konfirmasi bahwa Anda sudah membawa alat ke meja Toolman/Laboran untuk diinspeksi?')">
+                    <button type="submit" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition flex items-center space-x-1.5 ml-auto cursor-pointer">
+                      <i class="fas fa-box-open"></i>
+                      <span>Serahkan ke Meja Toolman</span>
+                    </button>
+                  </form>
+                <% } else { %>
+                  <span class="text-xs text-slate-400 italic">Menunggu respon toolman</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<!-- SECTION 2: KATALOG ALAT PRAKTIKUM SIAP PINJAM -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h3 class="text-lg font-bold text-slate-900">Katalog Alat Praktikum Tersedia</h3>
+      <p class="text-xs text-slate-500">Peralatan lab yang memiliki stok fisik siap untuk dipinjam</p>
+    </div>
+    <a href="/tools" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">
+      Lihat Semua Alat &rarr;
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% availableTools.forEach(tool => { %>
+      <div class="p-4 rounded-xl border border-slate-200 hover:border-emerald-300 hover:shadow-md transition flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+              <%= tool.category ? tool.category.namaKategori : 'Umum' %>
+            </span>
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700">
+              Stok: <%= tool.stok %>
+            </span>
+          </div>
+          <h4 class="font-bold text-slate-900 text-sm leading-tight mb-1"><%= tool.namaAlat %></h4>
+          <p class="text-xs text-slate-500 line-clamp-2"><%= tool.spesifikasi || '-' %></p>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <span class="text-[11px] text-slate-500 font-medium">Kondisi: <strong class="text-emerald-600"><%= tool.kondisi %></strong></span>
+          <a href="/borrowings/create?toolId=<%= tool.id %>" class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs border border-emerald-200 transition">
+            Pinjam Alat &rarr;
+          </a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

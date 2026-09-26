@@ -1,0 +1,164 @@
+<%- include('../partials/header') %>
+
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Inventaris Sarana Alat Praktikum Lab</h1>
+    <p class="text-sm text-slate-500 mt-1">Daftar sarpras, spesifikasi teknis, dan ketersediaan stok fisik di Lab RPL & Elektronika</p>
+  </div>
+  <% if (user.role === 'ADMIN') { %>
+    <a href="/tools/create" class="inline-flex items-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-600/30 transition">
+      <i class="fas fa-plus"></i>
+      <span>Tambah Alat Baru</span>
+    </a>
+  <% } else if (user.role === 'PEMINJAM') { %>
+    <a href="/borrowings/create" class="inline-flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-600/30 transition">
+      <i class="fas fa-hand-holding-box"></i>
+      <span>Ajukan Peminjaman</span>
+    </a>
+  <% } %>
+</div>
+
+<!-- Filter & Search Bar -->
+<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6">
+  <form action="/tools" method="GET" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+    <div class="sm:col-span-5 relative">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+        <i class="fas fa-search"></i>
+      </div>
+      <input 
+        type="text" 
+        name="search" 
+        value="<%= search %>" 
+        placeholder="Cari nama alat / spesifikasi..." 
+        class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800"
+      >
+    </div>
+
+    <div class="sm:col-span-3">
+      <select name="categoryId" onchange="this.form.submit()" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
+        <option value="ALL">Semua Kategori</option>
+        <% categories.forEach(cat => { %>
+          <option value="<%= cat.id %>" <%= selectedCategory == cat.id ? 'selected' : '' %>>
+            <%= cat.namaKategori %>
+          </option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="sm:col-span-2">
+      <select name="kondisi" onchange="this.form.submit()" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
+        <option value="ALL">Semua Kondisi</option>
+        <option value="BAIK" <%= selectedKondisi === 'BAIK' ? 'selected' : '' %>>Kondisi Baik</option>
+        <option value="RUSAK" <%= selectedKondisi === 'RUSAK' ? 'selected' : '' %>>Kondisi Rusak</option>
+      </select>
+    </div>
+
+    <div class="sm:col-span-2 flex space-x-2">
+      <button type="submit" class="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1">
+        <i class="fas fa-filter text-xs"></i>
+        <span>Filter</span>
+      </button>
+      <% if (search || selectedCategory !== 'ALL' || selectedKondisi !== 'ALL') { %>
+        <a href="/tools" class="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition flex items-center justify-center" title="Reset Filter">
+          <i class="fas fa-times"></i>
+        </a>
+      <% } %>
+    </div>
+  </form>
+</div>
+
+<!-- Tools Table Card -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+  <% if (tools.length === 0) { %>
+    <div class="py-16 text-center text-slate-400">
+      <i class="fas fa-box-open text-5xl mb-3 text-slate-300"></i>
+      <h3 class="text-base font-bold text-slate-700">Tidak ada alat yang ditemukan</h3>
+      <p class="text-xs text-slate-400 mt-1">Coba gunakan kata kunci pencarian atau kategori lain.</p>
+    </div>
+  <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
+            <th class="py-3.5 px-5">Nama Alat & Spesifikasi</th>
+            <th class="py-3.5 px-4">Kategori</th>
+            <th class="py-3.5 px-4 text-center">Stok Fisik</th>
+            <th class="py-3.5 px-4 text-center">Kondisi</th>
+            <th class="py-3.5 px-5 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <% tools.forEach(t => { %>
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-4 px-5">
+                <div class="font-bold text-slate-900 text-base leading-tight"><%= t.namaAlat %></div>
+                <div class="text-xs text-slate-500 mt-1"><%= t.spesifikasi || 'Spesifikasi standar laboratorium' %></div>
+              </td>
+              <td class="py-4 px-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                  <i class="fas fa-tag mr-1 text-[10px] text-slate-400"></i>
+                  <%= t.category ? t.category.namaKategori : 'Tanpa Kategori' %>
+                </span>
+              </td>
+              <td class="py-4 px-4 text-center whitespace-nowrap">
+                <% if (t.stok > 3) { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <%= t.stok %> Unit (Tersedia)
+                  </span>
+                <% } else if (t.stok > 0) { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                    <%= t.stok %> Unit (Terbatas)
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                    0 Unit (Habis)
+                  </span>
+                <% } %>
+              </td>
+              <td class="py-4 px-4 text-center whitespace-nowrap">
+                <% if (t.kondisi === 'BAIK') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                    <i class="fas fa-check-circle mr-1 text-[10px]"></i> BAIK
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                    <i class="fas fa-triangle-exclamation mr-1 text-[10px]"></i> RUSAK
+                  </span>
+                <% } %>
+              </td>
+              <td class="py-4 px-5 text-right whitespace-nowrap">
+                <% if (user.role === 'ADMIN') { %>
+                  <div class="inline-flex items-center space-x-2">
+                    <a href="/tools/<%= t.id %>/edit" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition" title="Edit Alat">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <form action="/tools/<%= t.id %>/delete" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus alat <%= t.namaAlat %> dari inventaris?')">
+                      <button type="submit" class="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold transition" title="Hapus Alat">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </div>
+                <% } else if (user.role === 'PEMINJAM') { %>
+                  <% if (t.stok > 0 && t.kondisi === 'BAIK') { %>
+                    <a href="/borrowings/create?toolId=<%= t.id %>" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition">
+                      <i class="fas fa-hand-holding"></i>
+                      <span>Pinjam Alat</span>
+                    </a>
+                  <% } else { %>
+                    <button disabled class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-400 font-semibold text-xs cursor-not-allowed">
+                      Tidak Tersedia
+                    </button>
+                  <% } %>
+                <% } else { %>
+                  <span class="text-xs text-slate-400 font-medium">Monitoring Toolman</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

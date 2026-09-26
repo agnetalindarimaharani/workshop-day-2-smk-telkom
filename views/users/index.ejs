@@ -1,0 +1,129 @@
+<%- include('../partials/header') %>
+
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Manajemen Pengguna Laboratorium</h1>
+    <p class="text-sm text-slate-500 mt-1">Kelola data hak akses akun Admin, Toolman / Laboran, dan Peminjam (Siswa/Guru)</p>
+  </div>
+  <a href="/users/create" class="inline-flex items-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-600/30 transition">
+    <i class="fas fa-user-plus"></i>
+    <span>Tambah Pengguna Baru</span>
+  </a>
+</div>
+
+<!-- Search & Filter by Role -->
+<div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm mb-6">
+  <form action="/users" method="GET" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+    <div class="sm:col-span-7 relative">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+        <i class="fas fa-search"></i>
+      </div>
+      <input 
+        type="text" 
+        name="search" 
+        value="<%= search %>" 
+        placeholder="Cari nama pengguna / username / NISN..." 
+        class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-slate-800"
+      >
+    </div>
+
+    <div class="sm:col-span-3">
+      <select name="role" onchange="this.form.submit()" class="w-full py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-700">
+        <option value="ALL">Semua Peran (Role)</option>
+        <option value="ADMIN" <%= currentRole === 'ADMIN' ? 'selected' : '' %>>Administrator</option>
+        <option value="TOOLMAN" <%= currentRole === 'TOOLMAN' ? 'selected' : '' %>>Toolman / Laboran</option>
+        <option value="PEMINJAM" <%= currentRole === 'PEMINJAM' ? 'selected' : '' %>>Peminjam (Siswa)</option>
+      </select>
+    </div>
+
+    <div class="sm:col-span-2 flex space-x-2">
+      <button type="submit" class="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1">
+        <i class="fas fa-filter text-xs"></i>
+        <span>Filter</span>
+      </button>
+      <% if (search || currentRole !== 'ALL') { %>
+        <a href="/users" class="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-semibold transition flex items-center justify-center" title="Reset Filter">
+          <i class="fas fa-times"></i>
+        </a>
+      <% } %>
+    </div>
+  </form>
+</div>
+
+<!-- Table Card -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+  <% if (users.length === 0) { %>
+    <div class="py-16 text-center text-slate-400">
+      <i class="fas fa-users-slash text-5xl mb-3 text-slate-300"></i>
+      <h3 class="text-base font-bold text-slate-700">Tidak ada pengguna ditemukan</h3>
+      <p class="text-xs text-slate-400 mt-1">Coba gunakan kata kunci pencarian atau role lain.</p>
+    </div>
+  <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-xs font-bold uppercase tracking-wider text-slate-500 bg-slate-50">
+            <th class="py-3.5 px-5">Nama & Username</th>
+            <th class="py-3.5 px-4">Role Hak Akses</th>
+            <th class="py-3.5 px-4">NISN / NIP</th>
+            <th class="py-3.5 px-4">No. Telepon</th>
+            <th class="py-3.5 px-4 text-center">Total Sirkulasi</th>
+            <th class="py-3.5 px-5 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <% users.forEach(u => { %>
+            <tr class="hover:bg-slate-50/80 transition">
+              <td class="py-4 px-5">
+                <div class="font-bold text-slate-900"><%= u.nama %></div>
+                <div class="text-xs text-slate-400 font-mono">@<%= u.username %></div>
+              </td>
+              <td class="py-4 px-4 whitespace-nowrap">
+                <% if (u.role === 'ADMIN') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                    <i class="fas fa-shield-alt mr-1 text-[10px]"></i> ADMIN
+                  </span>
+                <% } else if (u.role === 'TOOLMAN') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                    <i class="fas fa-tools mr-1 text-[10px]"></i> TOOLMAN
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <i class="fas fa-user-graduate mr-1 text-[10px]"></i> PEMINJAM
+                  </span>
+                <% } %>
+              </td>
+              <td class="py-4 px-4 text-xs font-mono text-slate-600 whitespace-nowrap">
+                <%= u.nisn || '-' %>
+              </td>
+              <td class="py-4 px-4 text-xs text-slate-600 whitespace-nowrap">
+                <%= u.telepon || '-' %>
+              </td>
+              <td class="py-4 px-4 text-center whitespace-nowrap">
+                <span class="text-xs font-bold text-slate-700">
+                  <%= u._count.borrowings %> Transaksi
+                </span>
+              </td>
+              <td class="py-4 px-5 text-right whitespace-nowrap">
+                <div class="inline-flex items-center space-x-2">
+                  <a href="/users/<%= u.id %>/edit" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition" title="Edit Pengguna">
+                    <i class="fas fa-user-edit"></i>
+                  </a>
+                  <% if (u.id !== user.id) { %>
+                    <form action="/users/<%= u.id %>/delete" method="POST" onsubmit="return confirm('Hapus akun <%= u.nama %> (@<%= u.username %>)?')">
+                      <button type="submit" class="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold transition" title="Hapus Pengguna">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,95 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <a href="/tools" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center mb-1">
+        <i class="fas fa-arrow-left mr-1.5"></i> Kembali ke Inventaris
+      </a>
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Edit Inventaris Alat</h1>
+      <p class="text-xs text-slate-500 mt-1">Perbarui data spesifikasi, stok fisik, atau kondisi alat lab</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+    <form action="/tools/<%= tool.id %>" method="POST" class="space-y-5">
+      <div>
+        <label for="namaAlat" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Nama Alat Praktikum <span class="text-rose-500">*</span>
+        </label>
+        <input 
+          type="text" 
+          name="namaAlat" 
+          id="namaAlat" 
+          required 
+          value="<%= tool.namaAlat %>"
+          class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-800"
+        >
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="categoryId" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Kategori Alat <span class="text-rose-500">*</span>
+          </label>
+          <select name="categoryId" id="categoryId" required class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-800">
+            <% categories.forEach(c => { %>
+              <option value="<%= c.id %>" <%= tool.categoryId === c.id ? 'selected' : '' %>>
+                <%= c.namaKategori %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div>
+          <label for="stok" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Jumlah Stok Fisik <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="number" 
+            name="stok" 
+            id="stok" 
+            min="0" 
+            required 
+            value="<%= tool.stok %>"
+            class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-800"
+          >
+        </div>
+      </div>
+
+      <div>
+        <label for="kondisi" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Kondisi Fisik Alat <span class="text-rose-500">*</span>
+        </label>
+        <select name="kondisi" id="kondisi" required class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-800">
+          <option value="BAIK" <%= tool.kondisi === 'BAIK' ? 'selected' : '' %>>BAIK (Siap Pakai untuk Praktikum)</option>
+          <option value="RUSAK" <%= tool.kondisi === 'RUSAK' ? 'selected' : '' %>>RUSAK (Perlu Perbaikan / Maintenance)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="spesifikasi" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Spesifikasi Teknis & Lokasi Rak Simpan
+        </label>
+        <textarea 
+          name="spesifikasi" 
+          id="spesifikasi" 
+          rows="3" 
+          class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-slate-800"
+        ><%= tool.spesifikasi || '' %></textarea>
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+        <a href="/tools" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition">
+          Batal
+        </a>
+        <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition flex items-center space-x-1.5 cursor-pointer">
+          <i class="fas fa-save"></i>
+          <span>Perbarui Data Alat</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

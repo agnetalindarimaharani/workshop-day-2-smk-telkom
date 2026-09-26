@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #0f172a;
+      background-color: #f8fafc;
+    }
+    @page {
+      size: A4 landscape;
+      margin: 12mm 15mm;
+    }
+    @media print {
+      body {
+        background-color: #ffffff;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-border {
+        border-color: #000000 !important;
+      }
+      table {
+        page-break-inside: auto;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+    }
+  </style>
+</head>
+<body class="p-4 sm:p-8">
+
+  <!-- Print Action Bar (Hidden when printing) -->
+  <div class="no-print max-w-5xl mx-auto mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-md flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+        <i class="fas fa-print"></i>
+      </div>
+      <div>
+        <h4 class="font-bold text-sm text-slate-800">Pratinjau Cetak Laporan Sirkulasi Sarpras</h4>
+        <p class="text-xs text-slate-500">Gunakan opsi "Save as PDF" di menu cetak browser untuk menyimpan file PDF.</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button onclick="window.close()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs font-semibold cursor-pointer">
+        Tutup
+      </button>
+      <button onclick="window.print()" class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/30 flex items-center space-x-1.5 cursor-pointer">
+        <i class="fas fa-print"></i>
+        <span>Cetak Sekarang / Simpan PDF</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Document Paper Container -->
+  <div class="max-w-5xl mx-auto bg-white p-8 sm:p-12 border border-slate-200 shadow-sm print:shadow-none print:border-none print:p-0">
+    
+    <!-- KOP SURAT RESMI SEKOLAH -->
+    <div class="border-b-4 border-double border-slate-900 pb-4 mb-6">
+      <div class="flex items-center justify-between">
+        <div class="w-16 h-16 rounded-xl bg-red-600 text-white flex items-center justify-center font-extrabold text-2xl shadow-sm">
+          TELKOM
+        </div>
+        <div class="text-center flex-1 px-4">
+          <h3 class="text-sm font-bold tracking-widest text-slate-600 uppercase">YAYASAN PENDIDIKAN TELKOM</h3>
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">SMK TELKOM</h2>
+          <p class="text-xs sm:text-sm font-bold text-slate-800">LABORATORIUM REKAYASA PERANGKAT LUNAK & ELEKTRONIKA INDUSTRI</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">Program Keahlian: Rekayasa Perangkat Lunak, Teknik Jaringan Komputer, & Teknik Elektronika</p>
+        </div>
+        <div class="w-16 h-16 flex items-center justify-center text-slate-300 text-3xl">
+          <i class="fas fa-microchip"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENT TITLE -->
+    <div class="text-center mb-6">
+      <h1 class="text-lg font-black uppercase tracking-wider text-slate-900 underline decoration-slate-900 decoration-2">
+        LAPORAN REKAPITULASI SIRKULASI & PEMINJAMAN SARANA LAB
+      </h1>
+      <p class="text-xs text-slate-600 mt-1">
+        Periode: 
+        <span class="font-bold text-slate-800">
+          <%= startDate ? formatDate(startDate) : 'Awal Tahun Ajaran' %> s/d <%= endDate ? formatDate(endDate) : 'Sekarang' %>
+        </span>
+        • Status: <span class="font-bold text-slate-800"><%= selectedStatus === 'ALL' ? 'Semua Status' : selectedStatus %></span>
+      </p>
+    </div>
+
+    <!-- SUMMARY HIGHLIGHTS TABLE -->
+    <div class="grid grid-cols-3 gap-4 mb-6 text-xs border border-slate-300 rounded-lg p-3 bg-slate-50 print:bg-transparent">
+      <div>
+        <span class="text-slate-500 font-medium">Total Sirkulasi:</span>
+        <strong class="text-slate-900 block text-sm"><%= borrowings.length %> Transaksi</strong>
+      </div>
+      <div>
+        <span class="text-slate-500 font-medium">Total Unit Peralatan Dipinjam:</span>
+        <strong class="text-slate-900 block text-sm"><%= totalUnit %> Unit</strong>
+      </div>
+      <div>
+        <span class="text-slate-500 font-medium">Total Denda Kerusakan Terkumpul:</span>
+        <strong class="text-rose-700 block text-sm font-bold"><%= formatRupiah(totalDenda) %></strong>
+      </div>
+    </div>
+
+    <!-- DATA TABLE -->
+    <div class="overflow-x-auto mb-8">
+      <table class="w-full text-left text-xs border border-slate-300 print-border">
+        <thead>
+          <tr class="bg-slate-100 print:bg-slate-200 border-b border-slate-300 font-bold uppercase text-[11px] text-slate-700">
+            <th class="py-2.5 px-3 border-r border-slate-300 text-center w-10">No</th>
+            <th class="py-2.5 px-3 border-r border-slate-300">Tgl Pinjam</th>
+            <th class="py-2.5 px-3 border-r border-slate-300">Peminjam (Siswa/Guru)</th>
+            <th class="py-2.5 px-3 border-r border-slate-300">Alat Praktikum</th>
+            <th class="py-2.5 px-2 border-r border-slate-300 text-center w-12">Qty</th>
+            <th class="py-2.5 px-3 border-r border-slate-300">Tgl Kembali</th>
+            <th class="py-2.5 px-3 border-r border-slate-300 text-center">Status</th>
+            <th class="py-2.5 px-3 border-r border-slate-300 text-center">Kondisi</th>
+            <th class="py-2.5 px-3 border-r border-slate-300 text-right">Denda</th>
+            <th class="py-2.5 px-3">Petugas</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <% if (borrowings.length === 0) { %>
+            <tr>
+              <td colspan="10" class="py-6 text-center text-slate-400 italic">
+                Tidak ada catatan sirkulasi sarpras dalam periode ini.
+              </td>
+            </tr>
+          <% } else { %>
+            <% borrowings.forEach((b, idx) => { %>
+              <tr class="border-b border-slate-200">
+                <td class="py-2 px-3 border-r border-slate-300 text-center font-mono"><%= idx + 1 %></td>
+                <td class="py-2 px-3 border-r border-slate-300 whitespace-nowrap"><%= formatDate(b.tglPinjam) %></td>
+                <td class="py-2 px-3 border-r border-slate-300 font-semibold">
+                  <%= b.user.nama %>
+                  <span class="block text-[10px] text-slate-500 font-mono"><%= b.user.nisn || '-' %></span>
+                </td>
+                <td class="py-2 px-3 border-r border-slate-300">
+                  <%= b.tool.namaAlat %>
+                  <span class="block text-[10px] text-slate-400"><%= b.tool.category ? b.tool.category.namaKategori : '-' %></span>
+                </td>
+                <td class="py-2 px-2 border-r border-slate-300 text-center font-bold"><%= b.jumlah %></td>
+                <td class="py-2 px-3 border-r border-slate-300 whitespace-nowrap">
+                  <%= b.tglKembaliReal ? formatDate(b.tglKembaliReal) : '-' %>
+                </td>
+                <td class="py-2 px-3 border-r border-slate-300 text-center font-semibold">
+                  <%= b.status %>
+                </td>
+                <td class="py-2 px-3 border-r border-slate-300 text-center font-bold <%= b.kondisiKembali === 'RUSAK' ? 'text-rose-600' : 'text-slate-700' %>">
+                  <%= b.kondisiKembali || '-' %>
+                </td>
+                <td class="py-2 px-3 border-r border-slate-300 text-right font-bold <%= b.denda > 0 ? 'text-rose-700' : 'text-slate-700' %>">
+                  <%= formatRupiah(b.denda) %>
+                </td>
+                <td class="py-2 px-3 text-slate-600">
+                  <%= b.toolman ? b.toolman.nama : '-' %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+        <tfoot>
+          <tr class="bg-slate-100 print:bg-slate-200 border-t-2 border-slate-400 font-bold">
+            <td colspan="4" class="py-2.5 px-3 border-r border-slate-300 text-right uppercase text-[11px]">Total Akumulasi:</td>
+            <td class="py-2.5 px-2 border-r border-slate-300 text-center"><%= totalUnit %> Unit</td>
+            <td colspan="3" class="py-2.5 px-3 border-r border-slate-300 text-right uppercase text-[11px]">Total Denda:</td>
+            <td class="py-2.5 px-3 border-r border-slate-300 text-right text-rose-700"><%= formatRupiah(totalDenda) %></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- TANDA TANGAN PENGESAHAN DOKUMEN -->
+    <div class="grid grid-cols-2 gap-8 text-xs pt-4 mt-8 break-inside-avoid">
+      <div class="text-center">
+        <p class="text-slate-600">Mengetahui,</p>
+        <p class="font-bold text-slate-900">Kepala Laboratorium Komputer & RPL</p>
+        <div class="h-20"></div>
+        <p class="font-bold text-slate-900 underline"><%= kepalaLab.nama %></p>
+        <p class="text-slate-500 font-mono"><%= kepalaLab.nisn || 'NIP. 198203152008011005' %></p>
+      </div>
+
+      <div class="text-center">
+        <p class="text-slate-600">Dicetak di Lampung, <%= formatDate(printDate) %></p>
+        <p class="font-bold text-slate-900">Toolman / Laboran Praktikum</p>
+        <div class="h-20"></div>
+        <p class="font-bold text-slate-900 underline"><%= toolmanUser.nama %></p>
+        <p class="text-slate-500 font-mono"><%= toolmanUser.nisn || 'NIP. 199407222020121008' %></p>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

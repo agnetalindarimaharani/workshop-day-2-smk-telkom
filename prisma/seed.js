@@ -1,257 +1,336 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
+
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Memulai proses seeding data awal SEWA AJA...');
+  console.log('🌱 Memulai seeding database Sarpras Lab RPL & Elektronika...');
 
   // 1. Bersihkan data lama jika ada
-  await prisma.rentalItem.deleteMany({});
-  await prisma.rentalTransaction.deleteMany({});
-  await prisma.item.deleteMany({});
-  await prisma.customer.deleteMany({});
+  await prisma.activityLog.deleteMany({});
+  await prisma.borrowing.deleteMany({});
+  await prisma.tool.deleteMany({});
+  await prisma.category.deleteMany({});
+  await prisma.user.deleteMany({});
 
-  // 2. Data Katalog Busana (Kebaya, Jas, Gaun, Beskap, Aksesoris)
-  const itemsData = [
-    {
-      code: 'KBY-01',
-      name: 'Kebaya Brokat Maroon Modern',
-      category: 'Kebaya',
-      size: 'M',
-      rentalPrice: 150000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Bahan brokat premium warna maroon dengan furing katun adem, cocok untuk wisuda dan resepsi.'
-    },
-    {
-      code: 'KBY-02',
-      name: 'Kebaya Encim Kartini Hijau Sage',
-      category: 'Kebaya',
-      size: 'L',
-      rentalPrice: 135000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Model kartini klasik warna hijau sage pastel, bordir tangan halus.'
-    },
-    {
-      code: 'KBY-03',
-      name: 'Kebaya Kutubaru Beludru Hitam Emas',
-      category: 'Kebaya',
-      size: 'All Size',
-      rentalPrice: 175000,
-      stock: 1,
-      status: 'RENTED',
-      description: 'Kutubaru beludru anggun berpadu aksen benang emas, ideal untuk seragam keluarga pengantin.'
-    },
-    {
-      code: 'KBY-04',
-      name: 'Kebaya Wisuda Payet Rose Gold',
-      category: 'Kebaya',
-      size: 'S',
-      rentalPrice: 160000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Payet mewah warna rose gold dengan model cape pundak modern.'
-    },
-    {
-      code: 'JAS-01',
-      name: 'Jas Formal Pria Hitam Slim Fit',
-      category: 'Jas Formal',
-      size: 'L',
-      rentalPrice: 150000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Setelan jas hitam bahan semi-wool berpadu celana formal, cocok untuk sidang skripsi dan wisuda.'
-    },
-    {
-      code: 'JAS-02',
-      name: 'Jas Tuxedo Navy Blue Satin Lapel',
-      category: 'Jas Formal',
-      size: 'XL',
-      rentalPrice: 180000,
-      stock: 1,
-      status: 'RENTED',
-      description: 'Tuxedo biru tua satin lapel mengkilap eksklusif untuk acara resepsi malam.'
-    },
-    {
-      code: 'JAS-03',
-      name: 'Jas Casual Abu-Abu Charcoal',
-      category: 'Jas Formal',
-      size: 'M',
-      rentalPrice: 140000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Warna abu-abu charcoal netral, model modern 2 kancing.'
-    },
-    {
-      code: 'GUN-01',
-      name: 'Gaun Pengantin Ballgown Putih Mutiara',
-      category: 'Gaun Pengantin',
-      size: 'All Size',
-      rentalPrice: 450000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Gaun pengantin mekar anggun dengan taburan mutiara swarovski dan ekor 1.5 meter.'
-    },
-    {
-      code: 'GUN-02',
-      name: 'Gaun Pesta A-Line Lilac Lavender',
-      category: 'Gaun Pengantin',
-      size: 'M',
-      rentalPrice: 220000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Gaun pesta manis warna lilac dengan bahan tile lembut.'
-    },
-    {
-      code: 'BSK-01',
-      name: 'Beskap Sunda Putih Bordir Silver',
-      category: 'Beskap Adat',
-      size: 'L',
-      rentalPrice: 160000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Setelan beskap Sunda putih lengkap dengan kain bendo dan sabuk boro.'
-    },
-    {
-      code: 'BSK-02',
-      name: 'Beskap Jawa Landung Hitam Beludru',
-      category: 'Beskap Adat',
-      size: 'XL',
-      rentalPrice: 170000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Beskap adat Jawa corak kraton bahan beludru premium hitam legam.'
-    },
-    {
-      code: 'AKS-01',
-      name: 'Set Dasi Kupu & Pocket Square Emas',
-      category: 'Aksesoris',
-      size: 'All Size',
-      rentalPrice: 25000,
-      stock: 1,
-      status: 'AVAILABLE',
-      description: 'Aksesoris pelengkap jas formal warna emas satin.'
-    }
-  ];
+  const defaultPassword = await bcrypt.hash('password123', 10);
 
-  const createdItems = [];
-  for (const item of itemsData) {
-    const res = await prisma.item.create({ data: item });
-    createdItems.push(res);
-  }
-  console.log(`✅ Berhasil menambahkan ${createdItems.length} koleksi busana.`);
-
-  // 3. Data Pelanggan / Penyewa
-  const c1 = await prisma.customer.create({
+  // 2. Buat Akun Pengguna (Admin, Toolman, Peminjam)
+  const adminUser = await prisma.user.create({
     data: {
-      name: 'Siti Nurhaliza',
-      phone: '0812-7890-1234',
-      address: 'Jl. ZA Pagar Alam No. 45, Bandar Lampung',
-      idCardNumber: '1871012345670001'
+      username: 'admin',
+      password: defaultPassword,
+      nama: 'Ahmad Subarjo, S.Kom',
+      role: 'ADMIN',
+      nisn: 'NIP. 198203152008011005',
+      telepon: '081234567890'
     }
   });
 
-  const c2 = await prisma.customer.create({
+  const toolmanUser = await prisma.user.create({
     data: {
-      name: 'Rizky Pratama',
-      phone: '0821-8899-7711',
-      address: 'Perum Beringin Raya Blok C, Natar',
-      idCardNumber: '09234567812'
+      username: 'toolman',
+      password: defaultPassword,
+      nama: 'Bagus Prakoso, A.Md',
+      role: 'TOOLMAN',
+      nisn: 'NIP. 199407222020121008',
+      telepon: '081398765432'
     }
   });
 
-  const c3 = await prisma.customer.create({
+  const peminjamUser = await prisma.user.create({
     data: {
-      name: 'Dewi Lestari',
-      phone: '0857-1122-3344',
-      address: 'Jl. Teuku Umar No. 12, Kedaton',
-      idCardNumber: '1871029876540003'
+      username: 'peminjam',
+      password: defaultPassword,
+      nama: 'Dimas Aditya Pratama',
+      role: 'PEMINJAM',
+      nisn: '0068491823',
+      telepon: '085711223344'
     }
   });
-  console.log('✅ Berhasil menambahkan 3 data pelanggan awal.');
 
-  // 4. Data Transaksi Persewaan Acuan ("SE-82383" & "SE-82384")
-  // Hitung tanggal: H-1, H, H+1 dari hari ini
-  const today = new Date();
-  const hMinus1 = new Date(today);
-  hMinus1.setDate(today.getDate() - 1);
-  const hariH = new Date(today);
-  const hPlus1 = new Date(today);
-  hPlus1.setDate(today.getDate() + 1);
-
-  // Transaksi 1: Siti Nurhaliza (Kebaya Kutubaru)
-  const itemKutubaru = createdItems.find(i => i.code === 'KBY-03');
-  const trx1 = await prisma.rentalTransaction.create({
+  const peminjam2 = await prisma.user.create({
     data: {
-      transactionCode: 'SE-82383',
-      customerId: c1.id,
-      cashierName: 'Seli (Kasir)',
-      pickupDate: hMinus1,
-      eventDate: hariH,
-      returnDate: hPlus1,
-      totalBasePrice: itemKutubaru.rentalPrice,
-      additionalCharge: 0,
-      discount: 0,
-      finalPrice: itemKutubaru.rentalPrice,
-      paidAmount: 100000,
-      remainingAmount: itemKutubaru.rentalPrice - 100000,
-      paymentType: 'DP',
-      paymentMethod: 'TUNAI',
-      rentalStatus: 'BOOKING',
-      customerGuarantee: 'E-KTP',
-      fittingNotes: 'Lengan kebaya tolong dikecilkan 2 cm di ujung pergelangan.',
-      rentalItems: {
-        create: [
-          {
-            itemId: itemKutubaru.id,
-            priceAtRent: itemKutubaru.rentalPrice,
-            itemCustomNote: 'Kancing depan nomor 2 dicek kembali kerapiannya.'
-          }
-        ]
+      username: 'siti',
+      password: defaultPassword,
+      nama: 'Siti Nurhaliza',
+      role: 'PEMINJAM',
+      nisn: '0071239841',
+      telepon: '085899887766'
+    }
+  });
+
+  const guruUser = await prisma.user.create({
+    data: {
+      username: 'budi_guru',
+      password: defaultPassword,
+      nama: 'Budi Santoso, S.Pd',
+      role: 'PEMINJAM',
+      nisn: 'NIP. 198811122015031002',
+      telepon: '081299881122'
+    }
+  });
+
+  console.log('✅ Pengguna demo berhasil dibuat (admin, toolman, peminjam)!');
+
+  // 3. Buat Kategori Alat Praktikum
+  const catJaringan = await prisma.category.create({
+    data: { namaKategori: 'Jaringan Komputer' }
+  });
+
+  const catElektronika = await prisma.category.create({
+    data: { namaKategori: 'Elektronika & IoT' }
+  });
+
+  const catMultimedia = await prisma.category.create({
+    data: { namaKategori: 'Multimedia & Proyektor' }
+  });
+
+  const catToolset = await prisma.category.create({
+    data: { namaKategori: 'Perkakas & Toolset' }
+  });
+
+  console.log('✅ Kategori alat praktikum berhasil dibuat!');
+
+  // 4. Buat Inventaris Alat Praktikum
+  const toolMikrotik = await prisma.tool.create({
+    data: {
+      namaAlat: 'Router Mikrotik RB750Gr3 hEX',
+      spesifikasi: '5x Gigabit LAN, Dual Core 880MHz, RouterOS v7 L4, Rak Lab A1',
+      stok: 7, // Stok tersedia saat ini (1 sedang dipinjam oleh Dimas)
+      kondisi: 'BAIK',
+      categoryId: catJaringan.id
+    }
+  });
+
+  const toolMikrotikWifi = await prisma.tool.create({
+    data: {
+      namaAlat: 'Mikrotik Wireless Router RB951Ui-2HnD',
+      spesifikasi: '5x Fast Ethernet, USB 2.0, AP 2.4GHz High Power, Rak Lab A2',
+      stok: 5,
+      kondisi: 'BAIK',
+      categoryId: catJaringan.id
+    }
+  });
+
+  const toolCrimping = await prisma.tool.create({
+    data: {
+      namaAlat: 'Crimping Tool RJ45 Cat5/Cat6 Proskit',
+      spesifikasi: 'Heavy duty ratchet frame, built-in wire cutter & stripper',
+      stok: 8,
+      kondisi: 'BAIK',
+      categoryId: catJaringan.id
+    }
+  });
+
+  const toolLanTester = await prisma.tool.create({
+    data: {
+      namaAlat: 'Kabel LAN Tester Digital RJ45 RJ11',
+      spesifikasi: 'Auto scan 1-8 LED tester, baterai kotak 9V, leather case',
+      stok: 6,
+      kondisi: 'BAIK',
+      categoryId: catJaringan.id
+    }
+  });
+
+  const toolSolder = await prisma.tool.create({
+    data: {
+      namaAlat: 'Solder Station Digital Atten 60W',
+      spesifikasi: 'Temp control 200-480°C, antistatis ESD safe, metal stand + brass sponge',
+      stok: 5,
+      kondisi: 'BAIK',
+      categoryId: catElektronika.id
+    }
+  });
+
+  const toolMultimeter = await prisma.tool.create({
+    data: {
+      namaAlat: 'Digital Multimeter Sanwa CD800a',
+      spesifikasi: '4000 counts, auto power-off, kontinuitas buzzer, safety cover',
+      stok: 4,
+      kondisi: 'BAIK',
+      categoryId: catElektronika.id
+    }
+  });
+
+  const toolArduino = await prisma.tool.create({
+    data: {
+      namaAlat: 'Arduino Uno R3 Starter Kit',
+      spesifikasi: 'Board DIP ATmega328P, breadboard 830, sensor box, kabel jumper',
+      stok: 10,
+      kondisi: 'BAIK',
+      categoryId: catElektronika.id
+    }
+  });
+
+  const toolProyektor = await prisma.tool.create({
+    data: {
+      namaAlat: 'Proyektor Epson EB-X500 XGA',
+      spesifikasi: '3600 Lumens 3LCD, input HDMI/VGA/USB, kabel power + remote',
+      stok: 2,
+      kondisi: 'BAIK',
+      categoryId: catMultimedia.id
+    }
+  });
+
+  const toolObeng = await prisma.tool.create({
+    data: {
+      namaAlat: 'Obeng Set Presisi 32-in-1 Jakemy',
+      spesifikasi: 'Magnetic bits CR-V, pinset antistatis, handle ergonomis',
+      stok: 8,
+      kondisi: 'BAIK',
+      categoryId: catToolset.id
+    }
+  });
+
+  console.log('✅ Inventaris sarpras lab praktikum berhasil dibuat!');
+
+  // 5. Buat Data Peminjaman Awal (Sirkulasi Realistis)
+  const now = new Date();
+  const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
+  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+  const yesterday = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000);
+  const tomorrow = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
+  const twoDaysLater = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
+
+  // Transaksi 1: Sudah Kembali, Kondisi BAIK, Denda 0
+  const borrow1 = await prisma.borrowing.create({
+    data: {
+      userId: peminjamUser.id,
+      toolId: toolCrimping.id,
+      jumlah: 1,
+      tglPinjam: threeDaysAgo,
+      tglKembaliRencana: twoDaysAgo,
+      tglKembaliReal: twoDaysAgo,
+      status: 'RETURNED',
+      kondisiKembali: 'BAIK',
+      denda: 0,
+      toolmanId: toolmanUser.id,
+      catatan: 'Praktikum crimping kabel LAN straight & cross di Lab 1. Alat kembali lengkap dan bersih.'
+    }
+  });
+
+  // Transaksi 2: Sudah Kembali, Kondisi RUSAK, Ada Denda
+  const borrow2 = await prisma.borrowing.create({
+    data: {
+      userId: peminjam2.id,
+      toolId: toolLanTester.id,
+      jumlah: 1,
+      tglPinjam: threeDaysAgo,
+      tglKembaliRencana: yesterday,
+      tglKembaliReal: yesterday,
+      status: 'RETURNED',
+      kondisiKembali: 'RUSAK',
+      denda: 50000,
+      toolmanId: toolmanUser.id,
+      catatan: 'Layar LCD tester retak dan soket RJ45 longgar saat dikembalikan. Denda penggantian sparepart.'
+    }
+  });
+
+  // Transaksi 3: Sedang Dipinjam (APPROVED)
+  const borrow3 = await prisma.borrowing.create({
+    data: {
+      userId: peminjamUser.id,
+      toolId: toolMikrotik.id,
+      jumlah: 1,
+      tglPinjam: yesterday,
+      tglKembaliRencana: tomorrow,
+      status: 'APPROVED',
+      toolmanId: toolmanUser.id,
+      catatan: 'Tugas praktik konfigurasi OSPF multi-area & bandwidth management.'
+    }
+  });
+
+  // Transaksi 4: Menunggu Persetujuan (PENDING)
+  const borrow4 = await prisma.borrowing.create({
+    data: {
+      userId: peminjamUser.id,
+      toolId: toolMultimeter.id,
+      jumlah: 1,
+      tglPinjam: now,
+      tglKembaliRencana: twoDaysLater,
+      status: 'PENDING',
+      catatan: 'Pengukuran tegangan output regulator Arduino & sensor DHT22.'
+    }
+  });
+
+  // Transaksi 5: Guru Meminjam Proyektor (APPROVED)
+  const borrow5 = await prisma.borrowing.create({
+    data: {
+      userId: guruUser.id,
+      toolId: toolProyektor.id,
+      jumlah: 1,
+      tglPinjam: now,
+      tglKembaliRencana: tomorrow,
+      status: 'APPROVED',
+      toolmanId: toolmanUser.id,
+      catatan: 'Presentasi materi pembelajaran Cloud Computing kelas XII RPL 2.'
+    }
+  });
+
+  console.log('✅ Riwayat dan transaksi peminjaman awal berhasil dibuat!');
+
+  // 6. Buat Audit Log Aktifitas Lab
+  await prisma.activityLog.createMany({
+    data: [
+      {
+        userId: adminUser.id,
+        aksi: 'INISIALISASI_SISTEM',
+        keterangan: 'Admin menginisialisasi sistem sarpras dan data master kategori alat.',
+        createdAt: threeDaysAgo
+      },
+      {
+        userId: peminjamUser.id,
+        aksi: 'AJUKAN_PINJAM',
+        keterangan: 'Siswa Dimas Aditya mengajukan peminjaman Crimping Tool Proskit (1 unit).',
+        createdAt: threeDaysAgo
+      },
+      {
+        userId: toolmanUser.id,
+        aksi: 'SETUJUI_PINJAM',
+        keterangan: 'Toolman Bagus menyetujui peminjaman Crimping Tool Proskit untuk Dimas Aditya.',
+        createdAt: threeDaysAgo
+      },
+      {
+        userId: toolmanUser.id,
+        aksi: 'INSPEKSI_PENGEMBALIAN',
+        keterangan: 'Toolman Bagus memproses pengembalian Crimping Tool: Fisik BAIK, Denda Rp 0.',
+        createdAt: twoDaysAgo
+      },
+      {
+        userId: toolmanUser.id,
+        aksi: 'INSPEKSI_PENGEMBALIAN',
+        keterangan: 'Toolman Bagus memeriksa pengembalian LAN Tester dari Siti Nurhaliza: Kondisi RUSAK, Denda Rp 50.000.',
+        createdAt: yesterday
+      },
+      {
+        userId: peminjamUser.id,
+        aksi: 'AJUKAN_PINJAM',
+        keterangan: 'Siswa Dimas Aditya mengajukan pinjam Router Mikrotik RB750Gr3 (1 unit).',
+        createdAt: yesterday
+      },
+      {
+        userId: toolmanUser.id,
+        aksi: 'SETUJUI_PINJAM',
+        keterangan: 'Toolman Bagus menyetujui peminjaman Router Mikrotik RB750Gr3 untuk Dimas Aditya. Stok berkurang menjadi 7.',
+        createdAt: yesterday
+      },
+      {
+        userId: peminjamUser.id,
+        aksi: 'AJUKAN_PINJAM',
+        keterangan: 'Siswa Dimas Aditya mengajukan peminjaman Digital Multimeter Sanwa (1 unit).',
+        createdAt: now
       }
-    }
+    ]
   });
 
-  // Transaksi 2: Rizky Pratama (Jas Tuxedo)
-  const itemTuxedo = createdItems.find(i => i.code === 'JAS-02');
-  const trx2 = await prisma.rentalTransaction.create({
-    data: {
-      transactionCode: 'SE-82384',
-      customerId: c2.id,
-      cashierName: 'Seli (Kasir)',
-      pickupDate: hMinus1,
-      eventDate: hariH,
-      returnDate: hPlus1,
-      totalBasePrice: itemTuxedo.rentalPrice,
-      additionalCharge: 15000, // Charge dasi tambahan
-      discount: 10000,
-      finalPrice: itemTuxedo.rentalPrice + 15000 - 10000,
-      paidAmount: itemTuxedo.rentalPrice + 15000 - 10000,
-      remainingAmount: 0,
-      paymentType: 'LUNAS',
-      paymentMethod: 'TRANSFER',
-      rentalStatus: 'DIAMBIL',
-      customerGuarantee: 'SIM',
-      fittingNotes: 'Celana panjang dipotong sementara lipat dalam 3 cm tanpa digunting.',
-      rentalItems: {
-        create: [
-          {
-            itemId: itemTuxedo.id,
-            priceAtRent: itemTuxedo.rentalPrice,
-            itemCustomNote: 'Termasuk hanger kayu dan sarung cover jas hitam.'
-          }
-        ]
-      }
-    }
-  });
-
-  console.log(`✅ Berhasil menambahkan 2 transaksi sewa aktif: ${trx1.transactionCode} & ${trx2.transactionCode}`);
-  console.log('🎉 Seeding database selesai! Database siap digunakan.');
+  console.log('✅ Activity log awal berhasil dibuat!');
+  console.log('🎉 Seeding database selesai dengan sukses!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error saat seeding data:', e);
+    console.error('❌ Terjadi kesalahan saat seeding:', e);
     process.exit(1);
   })
   .finally(async () => {

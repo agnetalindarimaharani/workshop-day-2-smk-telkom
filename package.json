@@ -1,7 +1,7 @@
 {
-  "name": "website-sewa-kebayajas",
+  "name": "sistem-peminjaman-sarpras-lab",
   "version": "1.0.0",
-  "description": "Sistem Informasi Manajemen Persewaan Busana (Kebaya & Jas) SEWA AJA - Workshop PjBL SMK Telkom Lampung Hari Ke-2",
+  "description": "Sistem Peminjaman Sarpras Lab RPL & Elektronika - Standar Uji Kompetensi Keahlian (UKK) / Industri",
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
@@ -24,9 +24,11 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^6.4.1",
+    "bcryptjs": "^3.0.3",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "express-session": "^1.19.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9",

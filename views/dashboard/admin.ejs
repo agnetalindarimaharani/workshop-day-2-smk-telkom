@@ -1,0 +1,242 @@
+<%- include('../partials/header') %>
+
+<!-- Top Welcome Banner -->
+<div class="mb-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+  <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur-sm mb-3">
+        <i class="fas fa-crown text-amber-400"></i>
+        <span>Hak Akses: Administrator / Kepala Lab</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Selamat Datang, <%= user.nama %>!</h1>
+      <p class="text-slate-300 text-sm mt-1 max-w-xl">
+        Pantau seluruh aset sarana praktikum laboratorium, pengguna, sirkulasi peminjaman, serta rekam jejak audit log secara real-time.
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2.5 shrink-0">
+      <a href="/tools/create" class="inline-flex items-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow-lg shadow-blue-600/30 transition">
+        <i class="fas fa-plus"></i>
+        <span>Tambah Alat Baru</span>
+      </a>
+      <a href="/users/create" class="inline-flex items-center space-x-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs sm:text-sm font-semibold backdrop-blur-sm transition border border-white/20">
+        <i class="fas fa-user-plus"></i>
+        <span>Tambah User</span>
+      </a>
+    </div>
+  </div>
+  <!-- Abstract background circle -->
+  <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+</div>
+
+<!-- 5 Stat Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5 mb-8">
+  <!-- Card 1: Total Alat -->
+  <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Item Inventaris</p>
+        <h3 class="text-2xl font-black text-slate-800 mt-1"><%= stats.totalTools %></h3>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+        <i class="fas fa-boxes-stacked"></i>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-3 flex items-center">
+      <span class="text-blue-600 font-semibold mr-1">Tipe alat</span> di Lab RPL & TE
+    </p>
+  </div>
+
+  <!-- Card 2: Total Stok Unit -->
+  <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Stok Fisik</p>
+        <h3 class="text-2xl font-black text-slate-800 mt-1"><%= stats.totalStock %> <span class="text-xs font-normal text-slate-500">unit</span></h3>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+        <i class="fas fa-cubes"></i>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-3 flex items-center">
+      <span class="text-emerald-600 font-semibold mr-1">Tersedia</span> untuk praktikum
+    </p>
+  </div>
+
+  <!-- Card 3: Total Sirkulasi -->
+  <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Sirkulasi</p>
+        <h3 class="text-2xl font-black text-slate-800 mt-1"><%= stats.totalBorrowings %></h3>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+        <i class="fas fa-clipboard-check"></i>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-3 flex items-center">
+      <span class="text-indigo-600 font-semibold mr-1">Riwayat</span> transaksi peminjaman
+    </p>
+  </div>
+
+  <!-- Card 4: Pengguna Lab -->
+  <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pengguna Lab</p>
+        <h3 class="text-2xl font-black text-slate-800 mt-1"><%= stats.totalUsers %></h3>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl">
+        <i class="fas fa-users"></i>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-3 flex items-center">
+      <span class="text-purple-600 font-semibold mr-1">Admin, Toolman</span> & Siswa
+    </p>
+  </div>
+
+  <!-- Card 5: Menunggu Approval -->
+  <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-amber-600">Pending Review</p>
+        <h3 class="text-2xl font-black text-amber-600 mt-1"><%= stats.pendingCount %></h3>
+      </div>
+      <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+        <i class="fas fa-hourglass-half"></i>
+      </div>
+    </div>
+    <p class="text-xs text-slate-500 mt-3 flex items-center">
+      <a href="/borrowings?status=PENDING" class="text-amber-600 font-semibold hover:underline">Perlu persetujuan &rarr;</a>
+    </p>
+  </div>
+</div>
+
+<!-- Main Split Section: Sirkulasi Terkini & Live Audit Log -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  
+  <!-- Left (2 cols): Sirkulasi Peminjaman Terkini -->
+  <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h3 class="font-bold text-base text-slate-800">Sirkulasi Peminjaman Terbaru</h3>
+        <p class="text-xs text-slate-500">5 transaksi peminjaman sarpras terakhir</p>
+      </div>
+      <a href="/borrowings" class="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center">
+        <span>Lihat Semua</span>
+        <i class="fas fa-arrow-right ml-1"></i>
+      </a>
+    </div>
+
+    <% if (recentBorrowings.length === 0) { %>
+      <div class="py-12 text-center text-slate-400">
+        <i class="fas fa-clipboard-list text-4xl mb-2"></i>
+        <p class="text-sm">Belum ada transaksi sirkulasi peminjaman.</p>
+      </div>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <th class="pb-3">Peminjam</th>
+              <th class="pb-3">Alat Praktikum</th>
+              <th class="pb-3 text-center">Qty</th>
+              <th class="pb-3">Tgl Pinjam</th>
+              <th class="pb-3 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% recentBorrowings.forEach(b => { %>
+              <tr class="hover:bg-slate-50 transition">
+                <td class="py-3.5 pr-3">
+                  <div class="font-semibold text-slate-800"><%= b.user.nama %></div>
+                  <div class="text-[11px] text-slate-400 font-mono"><%= b.user.nisn || '@' + b.user.username %></div>
+                </td>
+                <td class="py-3.5 pr-3">
+                  <div class="font-medium text-slate-700"><%= b.tool.namaAlat %></div>
+                </td>
+                <td class="py-3.5 text-center font-bold text-slate-600">
+                  <%= b.jumlah %>
+                </td>
+                <td class="py-3.5 text-xs text-slate-500 whitespace-nowrap">
+                  <%= formatDate(b.tglPinjam) %>
+                </td>
+                <td class="py-3.5 text-center">
+                  <% if (b.status === 'PENDING') { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                      Menunggu
+                    </span>
+                  <% } else if (b.status === 'APPROVED') { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                      Dipinjam
+                    </span>
+                  <% } else if (b.status === 'RETURNED') { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      Selesai
+                    </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                      Ditolak
+                    </span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Right (1 col): Live Audit Activity Log -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="font-bold text-base text-slate-800">Audit Log Aktifitas Lab</h3>
+          <p class="text-xs text-slate-500">Rekam jejak sirkulasi real-time</p>
+        </div>
+        <a href="/logs" class="text-xs font-bold text-blue-600 hover:text-blue-700">
+          Semua Log
+        </a>
+      </div>
+
+      <div class="space-y-4 max-h-[380px] overflow-y-auto custom-scrollbar pr-1">
+        <% if (recentActivities.length === 0) { %>
+          <p class="text-xs text-slate-400 py-6 text-center">Belum ada aktivitas tercatat.</p>
+        <% } else { %>
+          <% recentActivities.forEach(act => { %>
+            <div class="flex items-start space-x-3 text-xs">
+              <div class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                <% if (act.aksi.includes('TAMBAH') || act.aksi.includes('AJUKAN')) { %>
+                  <i class="fas fa-plus text-blue-600"></i>
+                <% } else if (act.aksi.includes('SETUJUI') || act.aksi.includes('PENGEMBALIAN')) { %>
+                  <i class="fas fa-check text-emerald-600"></i>
+                <% } else if (act.aksi.includes('HAPUS') || act.aksi.includes('TOLAK')) { %>
+                  <i class="fas fa-times text-rose-600"></i>
+                <% } else { %>
+                  <i class="fas fa-info text-slate-500"></i>
+                <% } %>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between gap-1">
+                  <span class="font-bold text-slate-800"><%= act.user ? act.user.nama : 'Sistem' %></span>
+                  <span class="text-[10px] text-slate-400 whitespace-nowrap"><%= formatDate(act.createdAt) %></span>
+                </div>
+                <p class="text-slate-600 mt-0.5 leading-snug"><%= act.keterangan %></p>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="mt-5 pt-4 border-t border-slate-100">
+      <a href="/logs" class="w-full block py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-xs text-center border border-slate-200 transition">
+        <i class="fas fa-shield-alt mr-1 text-slate-500"></i> Buka Pusat Audit Trail
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<%- include('../partials/footer') %>

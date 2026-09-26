@@ -1,55 +1,229 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="h-full bg-slate-50">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'SEWA AJA — Persewaan Busana SMK Telkom' %></title>
-  <link rel="stylesheet" href="/css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👘</text></svg>">
+  <title><%= typeof title !== 'undefined' ? title : 'Sistem Peminjaman Sarpras Lab RPL & Elektronika' %></title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            },
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
-<body>
+<body class="h-full text-slate-800 antialiased flex flex-col md:flex-row min-h-screen bg-slate-50">
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="container nav-container">
-      <a href="/" class="brand-logo">
-        <div class="brand-icon">👘</div>
-        <div class="brand-text">
-          <h1>SEWA AJA</h1>
-          <span>Manajemen Busana • SMK Telkom Lampung</span>
+<% if (typeof user !== 'undefined' && user) { %>
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="no-print w-full md:w-64 bg-slate-900 text-white shrink-0 flex flex-col justify-between shadow-xl z-30">
+    <div>
+      <!-- Brand & School Info -->
+      <div class="p-5 border-b border-slate-800 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+          <i class="fas fa-microchip text-lg"></i>
         </div>
-      </a>
-
-      <ul class="nav-links">
-        <li>
-          <a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
-            📊 Dashboard
-          </a>
-        </li>
-        <li>
-          <a href="/items" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'items' ? 'active' : '' %>">
-            👗 Cek Barang (Katalog)
-          </a>
-        </li>
-        <li>
-          <a href="/rentals" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'rentals' ? 'active' : '' %>">
-            📋 Cek Sewaan
-          </a>
-        </li>
-        <li>
-          <a href="/rentals/new" class="nav-link nav-cta">
-            ➕ Transaksi Sewa Baru
-          </a>
-        </li>
-      </ul>
-
-      <div class="nav-status">
-        <span class="status-dot"></span>
-        <span>EJS + SQLite (Aktif)</span>
+        <div>
+          <h1 class="font-bold text-base tracking-tight leading-tight text-white">SARPRAS LAB</h1>
+          <p class="text-xs text-slate-400 font-medium">SMK Telkom • RPL & TE</p>
+        </div>
       </div>
-    </div>
-  </nav>
 
-  <!-- Main Content Wrapper -->
-  <main class="main-content">
-    <div class="container">
+      <!-- User Mini Profile -->
+      <div class="px-5 py-4 bg-slate-800/50 border-b border-slate-800 flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-sm text-slate-200 border border-slate-600">
+          <%= user.nama ? user.nama.charAt(0).toUpperCase() : 'U' %>
+        </div>
+        <div class="overflow-hidden">
+          <div class="text-sm font-semibold text-white truncate"><%= user.nama %></div>
+          <div class="flex items-center space-x-1.5 mt-0.5">
+            <% if (user.role === 'ADMIN') { %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <i class="fas fa-shield-alt mr-1"></i> ADMIN
+              </span>
+            <% } else if (user.role === 'TOOLMAN') { %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                <i class="fas fa-tools mr-1"></i> TOOLMAN
+              </span>
+            <% } else { %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <i class="fas fa-user-graduate mr-1"></i> SISWA
+              </span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="px-3 py-4 space-y-1 text-sm font-medium">
+        <!-- Dashboard (Semua Role) -->
+        <a href="/dashboard" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath === '/dashboard' || currentPath === '/' ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+          <i class="fas fa-chart-pie w-6 text-center mr-2"></i>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- MENU KHUSUS ADMIN -->
+        <% if (user.role === 'ADMIN') { %>
+          <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">Master Data</div>
+          
+          <a href="/tools" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/tools') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-boxes-stacked w-6 text-center mr-2"></i>
+            <span>Inventaris Alat</span>
+          </a>
+
+          <a href="/categories" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/categories') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-tags w-6 text-center mr-2"></i>
+            <span>Kategori Alat</span>
+          </a>
+
+          <a href="/users" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/users') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-users-cog w-6 text-center mr-2"></i>
+            <span>Pengguna Lab</span>
+          </a>
+
+          <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">Transaksi & Audit</div>
+
+          <a href="/borrowings" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/borrowings') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-clipboard-list w-6 text-center mr-2"></i>
+            <span>Sirkulasi Pinjam</span>
+          </a>
+
+          <a href="/reports" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/reports') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-print w-6 text-center mr-2"></i>
+            <span>Laporan Sirkulasi</span>
+          </a>
+
+          <a href="/logs" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/logs') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-history w-6 text-center mr-2"></i>
+            <span>Audit Log Sistem</span>
+          </a>
+        <% } %>
+
+        <!-- MENU KHUSUS TOOLMAN -->
+        <% if (user.role === 'TOOLMAN') { %>
+          <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">Operasional Lab</div>
+
+          <a href="/borrowings" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/borrowings') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-check-double w-6 text-center mr-2"></i>
+            <span>Approval & Sirkulasi</span>
+          </a>
+
+          <a href="/tools" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/tools') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-boxes-stacked w-6 text-center mr-2"></i>
+            <span>Stok & Kondisi Alat</span>
+          </a>
+
+          <a href="/reports" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/reports') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-print w-6 text-center mr-2"></i>
+            <span>Cetak Laporan Sirkulasi</span>
+          </a>
+        <% } %>
+
+        <!-- MENU KHUSUS PEMINJAM (SISWA/GURU) -->
+        <% if (user.role === 'PEMINJAM') { %>
+          <div class="pt-3 pb-1 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400">Praktikum Lab</div>
+
+          <a href="/tools" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath.startsWith('/tools') ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-search w-6 text-center mr-2"></i>
+            <span>Katalog & Stok Alat</span>
+          </a>
+
+          <a href="/borrowings/create" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath === '/borrowings/create' ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-plus-circle w-6 text-center mr-2"></i>
+            <span>Ajukan Pinjam Alat</span>
+          </a>
+
+          <a href="/borrowings" class="flex items-center px-3 py-2.5 rounded-lg transition-colors <%= currentPath === '/borrowings' ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white' %>">
+            <i class="fas fa-clock-rotate-left w-6 text-center mr-2"></i>
+            <span>Peminjaman Saya</span>
+          </a>
+        <% } %>
+      </nav>
+    </div>
+
+    <!-- Bottom Logout & Version -->
+    <div class="p-4 border-t border-slate-800">
+      <a href="/logout" class="flex items-center justify-center space-x-2 w-full px-4 py-2.5 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white font-medium text-sm transition-all border border-rose-500/20">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Keluar Sistem</span>
+      </a>
+      <p class="text-[11px] text-slate-400 text-center mt-3 font-medium">Standar Uji Kompetensi Keahlian (UKK)</p>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+    <!-- Topbar -->
+    <header class="no-print bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+      <div class="flex items-center space-x-3">
+        <h2 class="text-xl font-bold text-slate-800"><%= typeof title !== 'undefined' ? title : 'Dashboard' %></h2>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="text-right hidden sm:block">
+          <p class="text-xs font-semibold text-slate-400">SMK Telkom Lab RPL & Elektronika</p>
+          <p class="text-xs text-slate-600 font-medium">Status: <span class="text-emerald-600 font-bold">Online</span></p>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
+          <i class="fas fa-user-shield"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <main class="flex-1 p-6 lg:p-8">
+      <%- include('./alerts') %>
+<% } else { %>
+  <!-- Jika Belum Login (Misal Halaman Publik/Login) -->
+  <main class="flex-1">
+<% } %>

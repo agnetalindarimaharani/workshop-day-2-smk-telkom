@@ -1,0 +1,116 @@
+<%- include('../partials/header') %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <a href="/users" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center mb-1">
+        <i class="fas fa-arrow-left mr-1.5"></i> Kembali ke Daftar Pengguna
+      </a>
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Tambah Pengguna Baru</h1>
+      <p class="text-xs text-slate-500 mt-1">Registrasi akun baru untuk Admin, Toolman, atau Peminjam (Siswa)</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+    <form action="/users" method="POST" class="space-y-4">
+      <div>
+        <label for="nama" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Nama Lengkap <span class="text-rose-500">*</span>
+        </label>
+        <input 
+          type="text" 
+          name="nama" 
+          id="nama" 
+          required 
+          placeholder="Contoh: Muhammad Reza Pratama" 
+          value="<%= typeof formData !== 'undefined' && formData.nama ? formData.nama : '' %>"
+          class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800"
+        >
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Username Login <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            name="username" 
+            id="username" 
+            required 
+            placeholder="Contoh: reza_siswa" 
+            value="<%= typeof formData !== 'undefined' && formData.username ? formData.username : '' %>"
+            class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800"
+          >
+        </div>
+
+        <div>
+          <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Kata Sandi <span class="text-rose-500">*</span>
+          </label>
+          <input 
+            type="password" 
+            name="password" 
+            id="password" 
+            required 
+            placeholder="Minimal 6 karakter" 
+            class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800"
+          >
+        </div>
+      </div>
+
+      <div>
+        <label for="role" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+          Peran Hak Akses (RBAC) <span class="text-rose-500">*</span>
+        </label>
+        <select name="role" id="role" required class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800">
+          <option value="PEMINJAM" selected>PEMINJAM (Siswa / Guru Peminjam Alat)</option>
+          <option value="TOOLMAN">TOOLMAN (Laboran / Petugas Meja Sarpras)</option>
+          <option value="ADMIN">ADMIN (Kepala Lab / IT Super Admin)</option>
+        </select>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="nisn" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            NISN / NIP
+          </label>
+          <input 
+            type="text" 
+            name="nisn" 
+            id="nisn" 
+            placeholder="Contoh: 0068491823" 
+            value="<%= typeof formData !== 'undefined' && formData.nisn ? formData.nisn : '' %>"
+            class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800"
+          >
+        </div>
+
+        <div>
+          <label for="telepon" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+            Nomor Telepon / WhatsApp
+          </label>
+          <input 
+            type="text" 
+            name="telepon" 
+            id="telepon" 
+            placeholder="Contoh: 08123456789" 
+            value="<%= typeof formData !== 'undefined' && formData.telepon ? formData.telepon : '' %>"
+            class="w-full px-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 text-slate-800"
+          >
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+        <a href="/users" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition">
+          Batal
+        </a>
+        <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition flex items-center space-x-1.5 cursor-pointer">
+          <i class="fas fa-user-plus"></i>
+          <span>Daftarkan Pengguna</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
